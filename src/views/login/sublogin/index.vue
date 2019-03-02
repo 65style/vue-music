@@ -1,35 +1,107 @@
 <template>
   <div class="sub-login auto-content">
-    <div class="content-slot">
-      <div class="text-input">
-        <svg-icon
-          icon-class="phone"
-          class-name="icon-phone"
-        ></svg-icon>
-        <input type="number" placeholder="手机号" v-model="phone">
+    <commonpage title="登录">
+      <div
+        class="content-slot"
+        slot="content"
+      >
+        <div class="text-input">
+          <svg-icon
+            icon-class="phone"
+            class-name="icon-phone"
+          ></svg-icon>
+          <input
+            v-if="type==='phone'"
+            type="tel"
+            placeholder="手机号"
+            v-model="phone"
+          >
+          <input
+            v-if="type==='email'"
+            type="text"
+            placeholder="邮箱"
+            v-model="email"
+          >
+        </div>
+        <div class="text-input">
+          <svg-icon
+            icon-class="passwd"
+            class-name="icon-passwd"
+          ></svg-icon>
+          <input
+            type="passwrod"
+            placeholder="密码"
+            v-modal="password"
+          >
+        </div>
+        <div
+          class="login-in"
+          @click="subLoginIn"
+        >
+          登录
+        </div>
       </div>
-      <div class="text-input">
-        <svg-icon
-          icon-class="passwd"
-          class-name="icon-passwd"
-        ></svg-icon>
-        <input type="passwrod" placeholder="密码" v-modal="password">
-      </div>
-      <div class="login-btn">
-        <input type="button">
-      </div>
-    </div>
+
+    </commonpage>
   </div>
 </template>
 
 <script>
+import Commonpage from '@/components/CommonPage'
 export default {
   data () {
     return {
+      // 登录类型
       type: null,
+      // 手机号
       phone: '',
-      email: '',
+      // 邮箱
+      email: '13651971940@163.com',
+      // 密码
       password: ''
+    }
+  },
+  components: {
+    Commonpage
+  },
+  methods: {
+    /**
+     * 点击 校验
+     */
+    subLoginIn () {
+      if ((this.phone || this.email) && this.password) {
+        // 手机登录
+        if (this.type === 'phone' && this.phone) {
+          if (this.$dutils.exp.isPhoneNum(this.phone)) this.login(this.type)
+          else this.$msg('手机格式不正确')
+        }
+        // 邮箱登录
+        if (this.type === 'email' && this.email) {
+          if (this.$dutils.exp.isEmail(this.email)) this.login(this.type)
+          else this.$msg('邮箱格式不正确')
+        }
+        return
+      }
+      this.$msg('请输入完成的内容')
+    },
+    /**
+     *  请求接口  手机邮箱登录
+     */
+    async login (type) {
+      let data = {
+        type: type,
+        password: this.password
+      }
+      if (type === 'phone') data.phone = this.phone
+      if (type === 'email') data.email = this.email
+      let res = await this.$store.dispatch('USER_LOGIN', data)
+      if (res) {
+        this.$msg('登录成功')
+        console.log(res)
+        setTimeout(() => {
+          this.$router.push('/main')
+        }, 1500)
+      }
     }
   },
   created () {
@@ -37,3 +109,46 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.content-slot {
+  width: p2r(6.8rem);
+  margin: p2r(0.2rem) auto;
+  .text-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: p2r(0.9rem);
+    @include border-1px($border_color);
+    .svg-icon {
+      font-size: p2r(0.4rem);
+      color: $icon_color;
+      flex: 0 0 p2r(0.5rem);
+      margin-right: p2r(0.15rem);
+      display: block;
+    }
+    input {
+      flex: 1 1 auto;
+      position: relative;
+      border: none;
+      display: block;
+      outline: none;
+      height: p2r(0.6rem);
+      font-size: $f_auto_s;
+      -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+    }
+  }
+  .login-in {
+    margin-top: p2r(0.5rem);
+    background: lg(110deg, $primary_color_s, $primary_color_d);
+    border: none;
+    outline: none;
+    width: 100%;
+    height: p2r(0.8rem);
+    line-height: p2r(0.8rem);
+    border-radius: p2r(0.5rem);
+    color: #fff;
+    font-size: $f_auto_l;
+  }
+}
+</style>

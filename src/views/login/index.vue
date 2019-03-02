@@ -15,6 +15,7 @@
         class="btn-login"
         to="/login/email"
       >邮箱登录</router-link>
+      <router-view></router-view>
     </div>
   </div>
 </template>
@@ -46,12 +47,20 @@
     .btn-login {
       display: block;
       line-height: p2r(0.8rem);
-      border: 1px solid $primaryColor;
+      border: 1px solid $primary_color;
       color: #fff;
       font-size: $f_auto_l;
       border-radius: p2r(0.5rem);
       margin: p2r(0.3rem) 0;
     }
+  }
+  .login-ruoter {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
   }
 }
 </style>
